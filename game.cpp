@@ -114,9 +114,27 @@ int main(){
     if(!FlushConsoleInputBuffer(hStdin)) ErrorExit("FlushConsoleInputBuffer");
 
     eventsCount += cNumRead;
-    cout << " iteration " << index << " total " << eventsCount << " current " << cNumRead; 
+    //cout << " iteration " << index << " total " << eventsCount << " current " << cNumRead;
+
+    for(DWORD i=0; i < cNumRead; i++){
+      if(irInBuf[i].EventType == KEY_EVENT){
+	KEY_EVENT_RECORD ker = irInBuf[i].Event.KeyEvent;
+	if(ker.bKeyDown){
+	  switch(ker.wVirtualKeyCode){
+	  case 38:
+	    cout << "GG" << endl;
+	    break;
+	  default:
+	    break;
+	  }
+	} else{
+	  cout << "key released" << endl;
+	}
+      }
+      index++;
+    }
     
-    bool somethingPressed = true;
+    /*bool somethingPressed = true;
     if(somethingPressed){
       int key = 0;
       movement(key, position);
@@ -127,7 +145,7 @@ int main(){
 	setMap(sizeOfMap, position, mp);
 	drawMap(mp, sizeOfMap, hStdout);
       }
-    }
+      }*/
   }
   
   return 0;

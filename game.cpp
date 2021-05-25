@@ -8,21 +8,10 @@ using namespace std;
 const int sizeOfMap = 4;
 const int baseX = 0;
 const int baseY = 0;
-const int actionKeys[] = {100, 119, 97, 115};
 
 void ErrorExit(LPCSTR lpszMessage){
   cout << lpszMessage;
   ExitProcess(0);
-}
-
-bool isActionKey(int key){
-  int quantityOfActionKeys = 4;
-  for(int i=0; i < quantityOfActionKeys; i++){
-    if(key == actionKeys[i]){
-      return true;
-    }
-  }
-  return false;
 }
 
 void setMap(int size, COORD position, char mp[sizeOfMap][sizeOfMap]){
@@ -54,20 +43,27 @@ void drawMap(char mp[sizeOfMap][sizeOfMap], int size, HANDLE stream){
   SetConsoleCursorPosition(stream, c);
 }
 
-void movement(int key, COORD& position){
-  if(key==actionKeys[0]){
-    position.X++;
-    cout << actionKeys[0];
-  } else if(key==actionKeys[1]){
-    position.Y++;
-    cout << actionKeys[1];
-  } else if(key==actionKeys[2]){
-    position.X--;
-    cout << actionKeys[2];
-  } else if(key==actionKeys[3]){
-    position.Y--;
-    cout << actionKeys[3];
-  }
+void input(KEY_EVENT_RECORD ker, COORD &position){
+  if(ker.bKeyDown){
+    switch(ker.wVirtualKeyCode){
+    case 37:
+      position.X--;
+      break;
+    case 38:
+      position.Y--;
+      break;
+    case 39:
+      position.X++;
+      break;
+    case 40:
+      position.Y++;
+      break;
+    default:
+      break;
+    }
+  } /*else{
+    cout << "key released" << endl;
+    }*/
 }
 
 int main(){
@@ -119,33 +115,13 @@ int main(){
     for(DWORD i=0; i < cNumRead; i++){
       if(irInBuf[i].EventType == KEY_EVENT){
 	KEY_EVENT_RECORD ker = irInBuf[i].Event.KeyEvent;
-	if(ker.bKeyDown){
-	  switch(ker.wVirtualKeyCode){
-	  case 38:
-	    cout << "GG" << endl;
-	    break;
-	  default:
-	    break;
-	  }
-	} else{
-	  cout << "key released" << endl;
-	}
-      }
-      index++;
-    }
-    
-    /*bool somethingPressed = true;
-    if(somethingPressed){
-      int key = 0;
-      movement(key, position);
-      if(key == 13){
-	break;
-      } else if(isActionKey(key)){
+	input(ker, position);
 	system("CLS");
 	setMap(sizeOfMap, position, mp);
 	drawMap(mp, sizeOfMap, hStdout);
       }
-      }*/
+      index++;
+    }
   }
   
   return 0;

@@ -48,15 +48,19 @@ void input(KEY_EVENT_RECORD ker, COORD &position){
     switch(ker.wVirtualKeyCode){
     case 37:
       position.X--;
+      if(position.X<0) position.X++;
       break;
     case 38:
       position.Y--;
+      if(position.Y<0) position.Y++;
       break;
     case 39:
       position.X++;
+      if(position.X>sizeOfMap-1) position.X--;
       break;
     case 40:
       position.Y++;
+      if(position.Y>sizeOfMap-1) position.Y--;
       break;
     default:
       break;

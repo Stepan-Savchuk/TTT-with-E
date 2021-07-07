@@ -28,19 +28,18 @@ void setMap(int size, COORD position, char mp[sizeOfMap][sizeOfMap]){
 
 void drawMap(char mp[sizeOfMap][sizeOfMap], int size, HANDLE stream){
   COORD c = {baseX, baseY};
-  for(int i=0; i<size; i++){
-    for(int j=0; j<size; j++){
-      cout << mp[i][j] << "|";
-      c.Y+=2;
-      SetConsoleCursorPosition(stream, c);
+  string lines[sizeOfMap];
+  for(int i=0; i < size; i++){
+    lines[i] = "";
+    for(int j=0; j < size; j++){
+      lines[i] += mp[i][j];
+      lines[i] += "|";
     }
-    c.X+=2;
-    c.Y=0;
-    SetConsoleCursorPosition(stream, c);
   }
-  c.X=baseX;
-  c.Y=baseY;
-  SetConsoleCursorPosition(stream, c);
+  for(int i=0; i < size; i++){
+    cout << lines[i] << endl;
+    cout << "--------" << endl;
+  }
 }
 
 void input(KEY_EVENT_RECORD ker, COORD &position){
@@ -65,9 +64,7 @@ void input(KEY_EVENT_RECORD ker, COORD &position){
     default:
       break;
     }
-  } /*else{
-    cout << "key released" << endl;
-    }*/
+  }
 }
 
 int main(){
@@ -114,18 +111,18 @@ int main(){
     if(!FlushConsoleInputBuffer(hStdin)) ErrorExit("FlushConsoleInputBuffer");
 
     eventsCount += cNumRead;
-    //cout << " iteration " << index << " total " << eventsCount << " current " << cNumRead;
 
+    bool kPressed = false;
+    
     for(DWORD i=0; i < cNumRead; i++){
       if(irInBuf[i].EventType == KEY_EVENT){
 	KEY_EVENT_RECORD ker = irInBuf[i].Event.KeyEvent;
 	input(ker, position);
-	system("CLS");
-	setMap(sizeOfMap, position, mp);
-	drawMap(mp, sizeOfMap, hStdout);
       }
-      index++;
     }
+    system("CLS");
+    setMap(sizeOfMap, position, mp);
+    drawMap(mp, sizeOfMap, hStdout);
   }
   
   return 0;

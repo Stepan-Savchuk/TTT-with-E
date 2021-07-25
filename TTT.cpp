@@ -1,129 +1,76 @@
-#include <iostream>
-#include <string>
-#include <stdio.h>
-#include <windows.h>
+#include<stdio.h>
+#include<SDL.h>
 
-using namespace std;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
-const int sizeOfMap = 4;
-const int baseX = 0;
-const int baseY = 0;
+bool init();
+bool loadMedia();
+void close();
 
-void ErrorExit(LPCSTR lpszMessage){
-  cout << lpszMessage;
-  ExitProcess(0);
-}
+SDL_Window* gWindow = NULL;
+SDL_Surface* gScreenSurface = NULL;
+SDL_Surface* gHelloWorld = NULL;
 
-void setMap(int size, COORD position, char mp[sizeOfMap][sizeOfMap]){
-  for(int i=0; i < size; i++){
-    for(int j=0; j < size; j++){
-      if(position.X==i and position.Y==j){
-	mp[i][j] = 'X';
-      } else {
-	mp[i][j]  = ' ';
-      }
+bool init(){
+  bool success = true;
+
+  if(SDL_Init(SDL_INIT_VIDEO) < 0){
+    printf("SDL couldn't initialize! SDL_Error: %s\n", SDL_GetError());
+    success = false;
+  }
+  else {
+    gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if(gWindow == NULL){
+      printf("Window couldn't be created. SDL_Error: %s\n", SDL_GetError());
+      success = false;
+    }
+    else {
+      gScreenSurface = SDL_GetWindowSurface(gWindow);
     }
   }
+
+  return success;
 }
 
-void drawMap(char mp[sizeOfMap][sizeOfMap], int size, HANDLE stream){
-  COORD c = {baseX, baseY};
-  string lines[sizeOfMap];
-  for(int i=0; i < size; i++){
-    lines[i] = "";
-    for(int j=0; j < size; j++){
-      lines[i] += mp[i][j];
-      lines[i] += "|";
-    }
+bool loadMedia(){
+  bool success = true;
+
+  gHelloWorld = SDL_LoadBMP("hello_world.bmp");
+  if(gHelloWorld = NULL){
+    printf("Unable to load image %s! SDL Error: %s\n", "hello_world", SDL_GetError());
+    success = false;
   }
-  for(int i=0; i < size; i++){
-    cout << lines[i] << endl;
-    cout << "--------" << endl;
-  }
+  return success;
 }
 
-void input(KEY_EVENT_RECORD ker, COORD &position){
-  if(ker.bKeyDown){
-    switch(ker.wVirtualKeyCode){
-    case 37:
-      position.X--;
-      if(position.X<0) position.X++;
-      break;
-    case 38:
-      position.Y--;
-      if(position.Y<0) position.Y++;
-      break;
-    case 39:
-      position.X++;
-      if(position.X>sizeOfMap-1) position.X--;
-      break;
-    case 40:
-      position.Y++;
-      if(position.Y>sizeOfMap-1) position.Y--;
-      break;
-    default:
-      break;
-    }
-  }
+void close(){
+  SDL_FreeSurface(gHelloWorld);
+  gHelloWorld = NULL;
+
+  SDL_DestroyWindow(gWindow);
+  gWindow = NULL;
+
+  SDL_Quit();
 }
 
-int main(){
-  HANDLE hStdin;
-  HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 
-  const short bufferSize = 128;
-  INPUT_RECORD irInBuf[bufferSize];
-
-  hStdin = GetStdHandle(STD_INPUT_HANDLE);
-  if(hStdin == INVALID_HANDLE_VALUE){
-    ErrorExit("GetStdHandle");
+int main(int argc, char* args[]){
+  if(!init()){
+    printf("Failed to initialize!\n");
   }
-
-  int index = 0;
-  int eventsCount = 0;
-  
-  COORD size;
-  size.X = 80;
-  size.Y = 40;
-
-  BOOL resizeSuccessful = SetConsoleScreenBufferSize(hStdout, size);
-  if(!resizeSuccessful){
-    DWORD error = GetLastError();
-    cout << "Fail " << error;
-    return 1;
-  }
-
-  HWND console = GetConsoleWindow();
-  BOOL moveSuccessful = MoveWindow(console, 0, 0, 1920, 1080, TRUE);
-
-  COORD position = {baseX, baseY};
-
-  char mp[sizeOfMap][sizeOfMap];
-
-  setMap(sizeOfMap, position, mp);
-  drawMap(mp, sizeOfMap, hStdout);
-  
-  while(true){
-    DWORD cNumRead = 0;
-    BOOL peekSuccessful = PeekConsoleInput(hStdin, irInBuf, bufferSize, &cNumRead);
-
-    if(!peekSuccessful) ErrorExit("PeekConsoleInput");
-    if(!FlushConsoleInputBuffer(hStdin)) ErrorExit("FlushConsoleInputBuffer");
-
-    eventsCount += cNumRead;
-
-    bool kPressed = false;
-    
-    for(DWORD i=0; i < cNumRead; i++){
-      if(irInBuf[i].EventType == KEY_EVENT){
-	KEY_EVENT_RECORD ker = irInBuf[i].Event.KeyEvent;
-	input(ker, position);
-      }
+  else {
+    if(!loadMedia()){
+      printf("Failed to load media!\n");
     }
-    system("CLS");
-    setMap(sizeOfMap, position, mp);
-    drawMap(mp, sizeOfMap, hStdout);
+    else {
+      SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+      SDL_UpdateWindowSurface(gWindow);
+      SDL_Delay(3000);
+    }
   }
-  
+
+  close();
+
   return 0;
 }

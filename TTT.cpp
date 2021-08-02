@@ -15,7 +15,9 @@ public:
 
   void free();
 
-  void render(int x, int y);
+  void setColor(Uint8 red, Uint8 green, Uint8 blue);
+
+  void render(int x, int y, SDL_Rect* clip = NULL);
 
   int getWidth();
   int getHeight();
@@ -39,6 +41,9 @@ SDL_Texture* loadTexture(std::string path);
 SDL_Texture* texture = NULL;
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+
+SDL_Rect spriteClips[4];
+LTexture spriteSheetTexture;
 
 LTexture fooTexture;
 LTexture backgroundTexture;
@@ -91,9 +96,19 @@ void LTexture::free(){
   }
 }
 
-void LTexture::render(int x, int y){
+void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue){
+  SDL_SetTextureColorMod(texture, red, green, blue);
+}
+
+void LTexture::render(int x, int y, SDL_Rect* clip){
   SDL_Rect renderQuad = {x, y, width, height};
-  SDL_RenderCopy(renderer, texture, NULL, &renderQuad);
+
+  if(clip != NULL){
+    renderQuad.w = clip->w;
+    renderQuad.h = clip->h;
+  }
+  
+  SDL_RenderCopy(renderer, texture, clip, &renderQuad);
 }
 
 int LTexture::getWidth(){
@@ -160,6 +175,31 @@ SDL_Surface* loadSurface(std::string path){
 bool loadMedia(){
   bool success = true;
 
+  if(!spriteSheetTexture.loadFromFile("images/sprites.png")){
+    printf("Failed to load sprite sheet texture!\n");
+    success = false;
+  } else {
+    spriteClips[0].x = 0;
+    spriteClips[0].y = 0;
+    spriteClips[0].w = 100;
+    spriteClips[0].h = 100;
+
+    spriteClips[1].x = 100;
+    spriteClips[1].y = 0;
+    spriteClips[1].w = 100;
+    spriteClips[1].h = 100;
+
+    spriteClips[2].x = 0;
+    spriteClips[2].y = 100;
+    spriteClips[2].w = 100;
+    spriteClips[2].h = 100;
+
+    spriteClips[3].x = 100;
+    spriteClips[3].y = 100;
+    spriteClips[3].w = 100;
+    spriteClips[3].h = 100;
+  }
+  
   if(!fooTexture.loadFromFile("images/billy.png")){
     printf("Failed to load Foo texture image\n");
     success = false;
@@ -200,14 +240,42 @@ int main(int argc, char* args[]){
 
       SDL_Event event;
 
+      Uint8 red = 255;
+      Uint8 green = 255;
+      Uint8 blue = 255;
+
       while(!quit){
 	while(SDL_PollEvent(&event) != 0){
-	  if(event.type == SDL_QUIT) quit = true;
+	  if(event.type == SDL_QUIT) {
+	    quit = true;
+	  } else if(event.type == SDL_KEYDOWN){
+	    switch(event.key.keysym.sym){
+	    case SDLK_q:
+	      red +=32;
+	      break;
+	    case SDLK_w:
+	      green +=32;
+	      break;
+	    case SDLK_e:
+	      blue +=32;
+	      break;
+	    case SDLK_a:
+	      red -=32;
+	      break;
+	    case SDLK_s:
+	      green -=32;
+	      break;
+	    case SDLK_d:
+	      blue -=32;
+	      break;
+	    }
+	  }
 	}
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(renderer);
 
-	backgroundTexture.render(0,0);
+	backgroundTexture.setColor(red, green, blue);
+	backgroundTexture.render(150,0);
 	
 	SDL_Rect fillRect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
@@ -226,6 +294,11 @@ int main(int argc, char* args[]){
 	}
 
 	fooTexture.render(300, 300);
+
+	spriteSheetTexture.render(0, 0, &spriteClips[0]);
+	spriteSheetTexture.render(SCREEN_WIDTH - spriteClips[1].w, 0, &spriteClips[1]);
+	spriteSheetTexture.render(0, SCREEN_HEIGHT-spriteClips[2].h, &spriteClips[2]);
+	spriteSheetTexture.render(SCREEN_WIDTH - spriteClips[3].w, SCREEN_HEIGHT-spriteClips[3].h, &spriteClips[3]);
 
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	

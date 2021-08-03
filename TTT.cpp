@@ -5,6 +5,7 @@
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+const int WALKING_ANIMATION_FRAMES = 4;
 
 class LTexture{
 public:
@@ -45,7 +46,7 @@ SDL_Texture* texture = NULL;
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
-SDL_Rect spriteClips[4];
+SDL_Rect spriteClips[WALKING_ANIMATION_FRAMES];
 LTexture spriteSheetTexture;
 
 LTexture fooTexture;
@@ -144,7 +145,7 @@ bool init(){
       printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
       success = false;
     } else {
-      renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+      renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
       if(renderer == NULL){
 	printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
@@ -186,29 +187,29 @@ SDL_Surface* loadSurface(std::string path){
 bool loadMedia(){
   bool success = true;
 
-  if(!spriteSheetTexture.loadFromFile("images/sprites.png")){
+  if(!spriteSheetTexture.loadFromFile("images/foo.png")){
     printf("Failed to load sprite sheet texture!\n");
     success = false;
   } else {
     spriteClips[0].x = 0;
     spriteClips[0].y = 0;
-    spriteClips[0].w = 100;
-    spriteClips[0].h = 100;
+    spriteClips[0].w = 64;
+    spriteClips[0].h = 205;
 
-    spriteClips[1].x = 100;
+    spriteClips[1].x = 64;
     spriteClips[1].y = 0;
-    spriteClips[1].w = 100;
-    spriteClips[1].h = 100;
+    spriteClips[1].w = 64;
+    spriteClips[1].h = 205;
 
-    spriteClips[2].x = 0;
-    spriteClips[2].y = 100;
-    spriteClips[2].w = 100;
-    spriteClips[2].h = 100;
+    spriteClips[2].x = 128;
+    spriteClips[2].y = 0;
+    spriteClips[2].w = 64;
+    spriteClips[2].h = 205;
 
-    spriteClips[3].x = 100;
-    spriteClips[3].y = 100;
-    spriteClips[3].w = 100;
-    spriteClips[3].h = 100;
+    spriteClips[3].x = 196;
+    spriteClips[3].y = 0;
+    spriteClips[3].w = 64;
+    spriteClips[3].h = 205;
   }
   
   if(!fooTexture.loadFromFile("images/billy.png")){
@@ -257,6 +258,8 @@ int main(int argc, char* args[]){
       Uint8 green = 255;
       Uint8 blue = 255;
       Uint8 alpha = 255;
+
+      int frame = 0;
 
       while(!quit){
 	while(SDL_PollEvent(&event) != 0){
@@ -316,7 +319,7 @@ int main(int argc, char* args[]){
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xFF, 0xFF);
 	SDL_RenderDrawLine(renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
 
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0x00, 0xFF);
+	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 	for(int i=0; i<SCREEN_HEIGHT; i+=4){
 	  SDL_RenderDrawPoint(renderer, SCREEN_WIDTH / 2, i);
 	}
@@ -324,10 +327,13 @@ int main(int argc, char* args[]){
 	fooTexture.setAlpha(alpha);
 	fooTexture.render(300, 300);
 
-	spriteSheetTexture.render(0, 0, &spriteClips[0]);
-	spriteSheetTexture.render(SCREEN_WIDTH - spriteClips[1].w, 0, &spriteClips[1]);
-	spriteSheetTexture.render(0, SCREEN_HEIGHT-spriteClips[2].h, &spriteClips[2]);
-	spriteSheetTexture.render(SCREEN_WIDTH - spriteClips[3].w, SCREEN_HEIGHT-spriteClips[3].h, &spriteClips[3]);
+	SDL_Rect* currentClip = &spriteClips[frame/4];
+	spriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip);
+
+	++frame;
+	if(frame/4 >= WALKING_ANIMATION_FRAMES){
+	  frame=0;
+	}
 
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	

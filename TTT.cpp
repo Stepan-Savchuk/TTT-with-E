@@ -103,6 +103,14 @@ void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue){
   SDL_SetTextureColorMod(texture, red, green, blue);
 }
 
+void LTexture::setBlendMode(SDL_BlendMode blending){
+  SDL_SetTextureBlendMode(texture, blending);
+}
+
+void LTexture::setAlpha(Uint8 alpha){
+  SDL_SetTextureAlphaMod(texture, alpha);
+}
+
 void LTexture::render(int x, int y, SDL_Rect* clip){
   SDL_Rect renderQuad = {x, y, width, height};
 
@@ -206,6 +214,8 @@ bool loadMedia(){
   if(!fooTexture.loadFromFile("images/billy.png")){
     printf("Failed to load Foo texture image\n");
     success = false;
+  } else {
+    fooTexture.setBlendMode(SDL_BLENDMODE_BLEND);
   }
 
   if(!backgroundTexture.loadFromFile("images/van.png")){
@@ -246,6 +256,7 @@ int main(int argc, char* args[]){
       Uint8 red = 255;
       Uint8 green = 255;
       Uint8 blue = 255;
+      Uint8 alpha = 255;
 
       while(!quit){
 	while(SDL_PollEvent(&event) != 0){
@@ -270,6 +281,20 @@ int main(int argc, char* args[]){
 	      break;
 	    case SDLK_d:
 	      blue -=32;
+	      break;
+	    case SDLK_z:
+	      if(alpha+10 > 255){
+		alpha=255;
+	      } else {
+		alpha+=10;
+	      }
+	      break;
+	    case SDLK_x:
+	      if(alpha-10 < 0){
+		alpha=0;
+	      } else {
+		alpha-=10;
+	      }
 	      break;
 	    }
 	  }
@@ -296,6 +321,7 @@ int main(int argc, char* args[]){
 	  SDL_RenderDrawPoint(renderer, SCREEN_WIDTH / 2, i);
 	}
 
+	fooTexture.setAlpha(alpha);
 	fooTexture.render(300, 300);
 
 	spriteSheetTexture.render(0, 0, &spriteClips[0]);

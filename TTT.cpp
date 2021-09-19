@@ -1,348 +1,168 @@
 #include<stdio.h>
 #include<string>
-#include<SDL.h>
-#include<SDL_image.h>
+#include<SDL2/SDL.h>
+#include<SDL2/SDL_ttf.h>
+#include<cmath>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const int WALKING_ANIMATION_FRAMES = 4;
 
-class LTexture{
+
+class WTexture {
+private:
+  SDL_Texture* texture;
+  int width;
+  int height;
 public:
-  LTexture();
-  ~LTexture();
-
-  bool loadFromFile(std::string path);
+  WTexture();
+  ~WTexture();
 
   void free();
 
-  void setColor(Uint8 red, Uint8 green, Uint8 blue);
+  bool loadFromString(TTF_Font *font, std::string str, SDL_Color textColor, SDL_Renderer* renderer);
 
-  void setBlendMode(SDL_BlendMode blending);
-  void setAlpha(Uint8 alpha);
+  void render(int x, int y, SDL_Renderer* renderer);
 
-  void render(int x, int y, SDL_Rect* clip = NULL);
-
-  int getWidth();
-  int getHeight();
-private:
-  SDL_Texture* texture;
-
-  int width;
-  int height;
+  int getWidth(){
+    return width;
+  }
+  int getHeight(){
+    return height;
+  }
 };
 
-
-bool init();
-bool loadMedia();
-void close();
-
-SDL_Surface* loadSurface(std::string path);
-
-SDL_Texture* loadTexture(std::string path);
-
-
-SDL_Texture* texture = NULL;
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-
-SDL_Rect spriteClips[WALKING_ANIMATION_FRAMES];
-LTexture spriteSheetTexture;
-
-LTexture fooTexture;
-LTexture backgroundTexture;
-
-SDL_Surface* screenSurface = NULL;
-
-
-LTexture::LTexture(){
+WTexture::WTexture(){
   texture = NULL;
   width = 0;
   height = 0;
 }
 
-LTexture::~LTexture(){
+WTexture::~WTexture(){
   free();
 }
 
-bool LTexture::loadFromFile(std::string path){
-  free();
+void WTexture::free(){
+  SDL_DestroyTexture(texture);
+  texture = NULL;
 
-  SDL_Texture* newTexture = NULL;
+  width = 0;
+  height = 0;
+}
 
-  SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-  if(loadedSurface == NULL){
-    printf("Unable to load image %s! SDL_Image Error: %s\n", path.c_str(), IMG_GetError());
-  } else {
-    SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0, 0));
-    
-    newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-    if(newTexture == NULL){
-      printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
+bool WTexture::loadFromString(TTF_Font *font, std::string str, SDL_Color textColor, SDL_Renderer* renderer){
+    free();
+
+    SDL_Surface* surface = TTF_RenderText_Solid(font, str.c_str(), textColor);
+    if(surface == NULL){
+      printf("Failed to render textSurface! SDL_ttf Error: %s\n", TTF_GetError());
     } else {
-      width = loadedSurface->w;
-      height = loadedSurface->h;
-    }
-
-    SDL_FreeSurface(loadedSurface);
-  }
-  
-  texture = newTexture;
-  return texture != NULL;
-}
-
-void LTexture::free(){
-  if(texture != NULL){
-    SDL_DestroyTexture(texture);
-    texture = NULL;
-    width = 0;
-    height = 0;
-  }
-}
-
-void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue){
-  SDL_SetTextureColorMod(texture, red, green, blue);
-}
-
-void LTexture::setBlendMode(SDL_BlendMode blending){
-  SDL_SetTextureBlendMode(texture, blending);
-}
-
-void LTexture::setAlpha(Uint8 alpha){
-  SDL_SetTextureAlphaMod(texture, alpha);
-}
-
-void LTexture::render(int x, int y, SDL_Rect* clip){
-  SDL_Rect renderQuad = {x, y, width, height};
-
-  if(clip != NULL){
-    renderQuad.w = clip->w;
-    renderQuad.h = clip->h;
-  }
-  
-  SDL_RenderCopy(renderer, texture, clip, &renderQuad);
-}
-
-int LTexture::getWidth(){
-  return width;
-}
-
-int LTexture::getHeight(){
-  return height;
-}
-
-
-bool init(){
-  bool success = true;
-
-  if(SDL_Init(SDL_INIT_VIDEO) < 0){
-    printf("SDL couldn't initialize! SDL Error: %s\n", SDL_GetError());
-    success = false;
-  }
-  else {
-    window = SDL_CreateWindow("TTT", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if(window == NULL){
-      printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
-      success = false;
-    } else {
-      renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
       if(renderer == NULL){
-	printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-	success = false;
+	printf("Unable to use globalRenderer! SDL Error: %s\n", SDL_GetError());
       } else {
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-	
-	int imgFlags = IMG_INIT_PNG;
-
-	if(!(IMG_Init(imgFlags) & imgFlags)){
-	  printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-	  success = false;
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	if(texture == NULL){
+	  printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
 	} else {
-	screenSurface = SDL_GetWindowSurface(window);
+	  width = surface->w;
+	  height = surface->h;
 	}
+	SDL_FreeSurface(surface);
       }
     }
-  }
-  
-  return success;
+
+    return texture!=NULL;
 }
 
-SDL_Surface* loadSurface(std::string path){
-  SDL_Surface* optimizedSurface = NULL;
+void WTexture::render(int x, int y, SDL_Renderer* renderer){
+  SDL_Rect renderRect = {x, y, height, width};
 
-  SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-  if(loadedSurface == NULL){
-    printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-  } else {
-    optimizedSurface = SDL_ConvertSurface(loadedSurface, screenSurface->format, 0);
-    if(optimizedSurface == NULL){
-      printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-    }
-    SDL_FreeSurface(loadedSurface);
-  }
-  return optimizedSurface;
+  SDL_RenderCopy(renderer, texture, NULL, &renderRect);
 }
 
-bool loadMedia(){
-  bool success = true;
+bool init();
+bool loadFont(TTF_Font *font, WTexture texture, std::string str, SDL_Renderer* renderer);
+void close(SDL_Window* window, SDL_Renderer* renderer);
 
-  if(!spriteSheetTexture.loadFromFile("images/foo.png")){
-    printf("Failed to load sprite sheet texture!\n");
-    success = false;
+
+bool loadFont(TTF_Font *font, WTexture texture, std::string str, SDL_Renderer* renderer){
+  font = TTF_OpenFont("Raleway-Black.ttf", 28);
+
+  if(font == NULL){
+    printf("Falied to load font! SDL_ttf Error %s\n", TTF_GetError());
+    return false;
   } else {
-    spriteClips[0].x = 0;
-    spriteClips[0].y = 0;
-    spriteClips[0].w = 64;
-    spriteClips[0].h = 205;
+    SDL_Color textColor = {0xFF,0xFF,0xFF};
 
-    spriteClips[1].x = 64;
-    spriteClips[1].y = 0;
-    spriteClips[1].w = 64;
-    spriteClips[1].h = 205;
-
-    spriteClips[2].x = 128;
-    spriteClips[2].y = 0;
-    spriteClips[2].w = 64;
-    spriteClips[2].h = 205;
-
-    spriteClips[3].x = 196;
-    spriteClips[3].y = 0;
-    spriteClips[3].w = 64;
-    spriteClips[3].h = 205;
+    if(!texture.loadFromString(font, str, textColor, renderer)){
+      printf("Failed to render texture\n");
+      return false;
+    } 
   }
-  
-  if(!fooTexture.loadFromFile("images/billy.png")){
-    printf("Failed to load Foo texture image\n");
-    success = false;
-  } else {
-    fooTexture.setBlendMode(SDL_BLENDMODE_BLEND);
-  }
-
-  if(!backgroundTexture.loadFromFile("images/van.png")){
-    printf("Failed to load Background texture image\n");
-    success = false;
-  }
-  
-  return success;
+  return true;
 }
 
-void close(){
-  fooTexture.free();
-  backgroundTexture.free();
-  
+void close(SDL_Window* window, SDL_Renderer* renderer){
   SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  window = NULL;
   renderer = NULL;
 
-  IMG_Quit();
+  SDL_DestroyWindow(window);
+  window = NULL;
+
   SDL_Quit();
 }
 
+int main(int argc, char *argv[]){
+  SDL_Window* window = NULL;
+  SDL_Renderer* globalRenderer = NULL;
 
-int main(int argc, char* args[]){
-  if(!init()){
-    printf("Failed to initialize!\n");
-  }
-  else {
-    if(!loadMedia()){
-      printf("Failed to load media!\n");
-    }
-    else {
-      bool quit = false;
-
-      SDL_Event event;
-
-      Uint8 red = 255;
-      Uint8 green = 255;
-      Uint8 blue = 255;
-      Uint8 alpha = 255;
-
-      int frame = 0;
-
-      while(!quit){
-	while(SDL_PollEvent(&event) != 0){
-	  if(event.type == SDL_QUIT) {
-	    quit = true;
-	  } else if(event.type == SDL_KEYDOWN){
-	    switch(event.key.keysym.sym){
-	    case SDLK_q:
-	      red +=32;
-	      break;
-	    case SDLK_w:
-	      green +=32;
-	      break;
-	    case SDLK_e:
-	      blue +=32;
-	      break;
-	    case SDLK_a:
-	      red -=32;
-	      break;
-	    case SDLK_s:
-	      green -=32;
-	      break;
-	    case SDLK_d:
-	      blue -=32;
-	      break;
-	    case SDLK_z:
-	      if(alpha+10 > 255){
-		alpha=255;
-	      } else {
-		alpha+=10;
-	      }
-	      break;
-	    case SDLK_x:
-	      if(alpha-10 < 0){
-		alpha=0;
-	      } else {
-		alpha-=10;
-	      }
-	      break;
-	    }
-	  }
-	}
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-	SDL_RenderClear(renderer);
-
-	backgroundTexture.setColor(red, green, blue);
-	backgroundTexture.render(150,0);
-	
-	SDL_Rect fillRect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-	SDL_RenderFillRect(renderer, &fillRect);
-
-	SDL_Rect outlineRect = {SCREEN_WIDTH / 6, SCREEN_HEIGHT /6, SCREEN_WIDTH / 2 * 3, SCREEN_HEIGHT / 2 * 3};
-	SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0xFF, 0xFF);
-	SDL_RenderDrawRect(renderer, &outlineRect);
-
-	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xFF, 0xFF);
-	SDL_RenderDrawLine(renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
-
-	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-	for(int i=0; i<SCREEN_HEIGHT; i+=4){
-	  SDL_RenderDrawPoint(renderer, SCREEN_WIDTH / 2, i);
-	}
-
-	fooTexture.setAlpha(alpha);
-	fooTexture.render(300, 300);
-
-	SDL_Rect* currentClip = &spriteClips[frame/4];
-	spriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip);
-
-	++frame;
-	if(frame/4 >= WALKING_ANIMATION_FRAMES){
-	  frame=0;
-	}
-
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	
-	SDL_RenderPresent(renderer);
+  if(SDL_Init(SDL_INIT_VIDEO) == -1){
+    printf("SDL couldn't initialize! SDL Error %s\n", SDL_GetError());
+  } else {
+    window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if(window == NULL){
+      printf("Window couldn't be created! SDL Error: %s\n", SDL_GetError());
+    } else {
+      globalRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+      if(globalRenderer == NULL){
+	printf("Renderer couldn't be created! SDL Error: %s\n", SDL_GetError());
+      } else {
+	SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+	if(TTF_Init() == -1) printf("SDL_ttf couldn't initialize! SDL Error: %s\n", TTF_GetError());
       }
     }
   }
 
-  close();
+  TTF_Font *font = NULL;
 
+  std::string map = "Hello Count 0\n";
+
+  WTexture mapTexture;
+
+  if(!loadFont(font, mapTexture, map, globalRenderer)){
+    printf("Error with font loading\n");
+  } else {
+    bool quit = false;
+    SDL_Event event;
+    while(!quit){
+      while(SDL_PollEvent(&event) != 0){
+	if(event.type == SDL_QUIT){
+	  quit = true;
+	}
+      }
+      SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+      
+      SDL_RenderClear(globalRenderer);
+
+      mapTexture.render(0, 0, globalRenderer);
+
+      SDL_RenderPresent(globalRenderer);
+    }
+  }
+}
+}
+
+  system("PAUSE");
+  close(window, globalRenderer);
+  
   return 0;
 }

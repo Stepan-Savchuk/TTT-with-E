@@ -4,6 +4,7 @@
 #include<SDL2/SDL_ttf.h>
 #include<cmath>
 
+
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
@@ -49,7 +50,7 @@ void WTexture::free(){
   height = 0;
 }
 
-bool WTexture::loadFromString(TTF_Font *font, std::string str, SDL_Color textColor, SDL_Renderer* renderer){
+bool WTexture::loadFromString(TTF_Font* font, std::string str, SDL_Color textColor, SDL_Renderer* renderer){
     free();
 
     SDL_Surface* surface = TTF_RenderText_Solid(font, str.c_str(), textColor);
@@ -74,10 +75,12 @@ bool WTexture::loadFromString(TTF_Font *font, std::string str, SDL_Color textCol
 }
 
 void WTexture::render(int x, int y, SDL_Renderer* renderer){
+  SDL_QueryTexture(texture, NULL, NULL, &height, &width);
   SDL_Rect renderRect = {x, y, height, width};
 
   SDL_RenderCopy(renderer, texture, NULL, &renderRect);
 }
+
 
 bool init(SDL_Window* window, SDL_Renderer* renderer);
 bool loadFont(TTF_Font *font, WTexture texture, std::string str, SDL_Renderer* renderer);
@@ -104,7 +107,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
 }
 
 bool loadFont(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer){
-  font = TTF_OpenFont("Raleway-Black.ttf", 28);
+  font = TTF_OpenFont("OpenSans-Regular.ttf", 64);
 
   if(font == NULL){
     printf("Falied to load font! SDL_ttf Error %s\n", TTF_GetError());
@@ -136,7 +139,7 @@ int main(int argc, char *argv[]){
 
   TTF_Font *font = NULL;
 
-  std::string map = "Hello Count 0\n";
+  std::string map = "Hello Count 0";
 
   WTexture mapTexture;
   

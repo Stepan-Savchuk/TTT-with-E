@@ -84,33 +84,26 @@ bool loadFont(TTF_Font *font, WTexture texture, std::string str, SDL_Renderer* r
 void close(SDL_Window* window, SDL_Renderer* renderer);
 
 
-bool init(SDL_Window* window, SDL_Renderer* renderer){
+bool init(SDL_Window** window, SDL_Renderer** renderer){
   if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
     printf("SDL couldn't initialize! SDL Error %s\n", SDL_GetError());
     return false;
   } else {
-    window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
-    if(window == NULL){
-      printf("Window couldn't be created! SDL Error: %s\n", SDL_GetError());
+    if(SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE, window, renderer) != 0){
+      printf("Unable to create window and default renderer! SDL Error: %s\n", SDL_GetError());
       return false;
     } else {
-      renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-      if(renderer == NULL){
-	printf("Renderer couldn't be created! SDL Error: %s\n", SDL_GetError());
+      SDL_SetRenderDrawColor(*renderer, 0x00, 0x00, 0x00, 0xFF);
+      if(TTF_Init() == -1) {
+	printf("SDL_ttf couldn't initialize! SDL Error: %s\n", TTF_GetError());
 	return false;
-      } else {
-	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-	if(TTF_Init() == -1) {
-	  printf("SDL_ttf couldn't initialize! SDL Error: %s\n", TTF_GetError());
-	  return false;
-	}
       }
     }
   }
   return true;
 }
 
-bool loadFont(TTF_Font *font, WTexture texture, std::string str, SDL_Renderer* renderer){
+bool loadFont(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer){
   font = TTF_OpenFont("Raleway-Black.ttf", 28);
 
   if(font == NULL){
@@ -119,7 +112,7 @@ bool loadFont(TTF_Font *font, WTexture texture, std::string str, SDL_Renderer* r
   } else {
     SDL_Color textColor = {0xFF,0xFF,0xFF};
 
-    if(!texture.loadFromString(font, str, textColor, renderer)){
+    if(!texture->loadFromString(font, str, textColor, renderer)){
       printf("Failed to render texture\n");
       return false;
     } 
@@ -147,10 +140,10 @@ int main(int argc, char *argv[]){
 
   WTexture mapTexture;
   
-  if(!init(window, globalRenderer)){
+  if(!init(&window, &globalRenderer)){
     printf("Error with init\n");
   } else {
-    if(!loadFont(font, mapTexture, map, globalRenderer)){
+    if(!loadFont(font, &mapTexture, map, globalRenderer)){
       printf("Error with font loading\n");
     } else {
       bool quit = false;
@@ -171,8 +164,6 @@ int main(int argc, char *argv[]){
       }
     }
   }
-
-  system("PAUSE");
   close(window, globalRenderer);
   
   return 0;

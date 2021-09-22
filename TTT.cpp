@@ -107,7 +107,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
 }
 
 bool loadFont(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer){
-  font = TTF_OpenFont("OpenSans-Regular.ttf", 64);
+  font = TTF_OpenFont("Raleway-Black.ttf", 64);
 
   if(font == NULL){
     printf("Falied to load font! SDL_ttf Error %s\n", TTF_GetError());

@@ -2,3 +2,5 @@
 *.exe
 *.png
 *.bmp
+*.zip
+Makefile~

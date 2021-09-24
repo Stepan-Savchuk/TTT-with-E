@@ -91,6 +91,33 @@ void WTexture::render(int x, int y, SDL_Renderer* renderer){
 
 
 
+class Position{
+private:
+  int x;
+  int y;
+public:
+  int getX(){
+    return x;
+  }
+  
+  int getY(){
+    return y;
+  }
+  
+  void setX(int value);
+  void setY(int value);
+};
+
+
+void Position::setX(int value){
+  x = value;
+}
+
+void Position::setY(int value){
+  y = value;
+}
+
+
 bool init(SDL_Window** window, SDL_Renderer** renderer);
 bool loadFont(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer);
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
@@ -119,8 +146,6 @@ int main(int argc, char *argv[]){
   SDL_Renderer* globalRenderer;
 
   TTF_Font* font = NULL;
-
-  std::string map = "Hello";
 
   std::string testMap[] = {"",
     "",

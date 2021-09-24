@@ -118,6 +118,61 @@ void Position::setY(int value){
 }
 
 
+
+class Player{
+private:
+  Position position;
+  std::string name;
+  bool mark;
+public:
+  Player(int x, int y, std::string name, bool mark);
+
+  int getX(){
+    return position.getX();
+  }
+
+  int getY(){
+    return position.getY();
+  }
+
+  std::string getName(){
+    return name;
+  }
+
+  bool getMark(){
+    return mark;
+  }
+
+  void changeX(int value);
+  void changeY(int value);
+
+  void setMark(bool value);
+};
+
+
+Player::Player(int x, int y, std::string name, bool mark){
+  position.setX(x);
+  position.setY(x);
+
+  this->name = name;
+
+  this->mark = mark;
+}
+
+void changeX(int value){
+  position.setX(position.getX() + value);
+}
+
+void changeY(int value){
+  position.setY(position.getY() + value);
+}
+
+void setMark(bool value){
+  mark = value;
+}
+
+
+
 bool init(SDL_Window** window, SDL_Renderer** renderer);
 bool loadFont(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer);
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);

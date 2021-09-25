@@ -175,7 +175,7 @@ void Player::setMark(bool value){
 
 
 bool init(SDL_Window** window, SDL_Renderer** renderer);
-bool loadFont(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer);
+bool loadTextures(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer);
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
 
@@ -244,7 +244,7 @@ int main(int argc, char *argv[]){
 	if(toShow){
 	  SDL_RenderClear(globalRenderer);
 	  for(int i=0; i < MAP_SIZE; i++){
-	    if(!loadFont(font, &mapTexture, testMap[i], globalRenderer)){
+	    if(!loadTextures(font, &mapTexture, testMap[i], globalRenderer)){
 	      printf("Error with font loading\n");
 	    } else {
 	      SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -285,7 +285,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
 }
 
 
-bool loadFont(TTF_Font* font, WTexture* texture, std::string str, SDL_Renderer* renderer){
+bool loadTextures(TTF_Font* font, WTexture* texture, std::string str, SDL_Renderer* renderer){
   font = TTF_OpenFont("Courier Prime.ttf", 32);
   if(font == NULL){
     printf("Falied to load font! SDL_ttf Error: %s\n", TTF_GetError());

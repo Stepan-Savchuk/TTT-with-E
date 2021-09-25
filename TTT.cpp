@@ -176,6 +176,7 @@ void Player::setMark(bool value){
 
 bool init(SDL_Window** window, SDL_Renderer** renderer);
 bool loadTextures(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer);
+void input();
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
 
@@ -228,18 +229,7 @@ int main(int argc, char *argv[]){
 	    quit = true;
 	  }
 	}
-	const Uint8* keyState = SDL_GetKeyboardState(NULL);
-	if(keyState[SDL_SCANCODE_UP]){
-	  printf("UP\n");
-	} else if(keyState[SDL_SCANCODE_DOWN]){
-	  printf("DOWN\n");
-	} else if(keyState[SDL_SCANCODE_LEFT]){
-	  printf("LEFT\n");
-	} else if(keyState[SDL_SCANCODE_RIGHT]){
-	  printf("RIGHT\n");
-	} else {
-	  printf("0\n");
-	}
+	input();
 
 	if(toShow){
 	  SDL_RenderClear(globalRenderer);
@@ -302,7 +292,20 @@ bool loadTextures(TTF_Font* font, WTexture* texture, std::string str, SDL_Render
 }
 
 
-
+void input(){
+  const Uint8* keyState = SDL_GetKeyboardState(NULL);
+  if(keyState[SDL_SCANCODE_UP]){
+    printf("UP\n");
+  } else if(keyState[SDL_SCANCODE_DOWN]){
+    printf("DOWN\n");
+  } else if(keyState[SDL_SCANCODE_LEFT]){
+    printf("LEFT\n");
+  } else if(keyState[SDL_SCANCODE_RIGHT]){
+    printf("RIGHT\n");
+  } else {
+    printf("0\n");
+  }
+}
 
 
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font){

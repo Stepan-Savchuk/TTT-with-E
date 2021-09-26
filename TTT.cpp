@@ -176,7 +176,7 @@ void Player::setMark(bool value){
 
 
 bool init(SDL_Window** window, SDL_Renderer** renderer);
-bool loadTextures(TTF_Font *font, std::vector<WTexture *> textures, std::string str, SDL_Renderer* renderer);
+bool loadTextures(TTF_Font *font, std::vector<WTexture *> textures, std::vector<std::string> strings, SDL_Renderer* renderer);
 void input();
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
@@ -215,15 +215,19 @@ int main(int argc, char *argv[]){
     printf("%s\n", testMap[i].c_str());
   }
 
-  WTexture mapTexture;
-
-  std::vector<WTexture *> textures = {&mapTexture};
   
   if(!init(&window, &globalRenderer)){
     printf("Error with init\n");
   } else {
       bool quit = false;
       bool toShow = true;
+
+      WTexture mapTexture;
+      WTexture playerTexture;
+      
+      std::vector<WTexture *> textures = {&mapTexture, &playerTexture};
+      
+      Player player = {"Player", 'X', 0, 0};
       
       SDL_Event event;
       while(!quit){
@@ -237,7 +241,8 @@ int main(int argc, char *argv[]){
 	if(toShow){
 	  SDL_RenderClear(globalRenderer);
 	  for(int i=0; i < MAP_SIZE; i++){
-	    if(!loadTextures(font, textures, testMap[i], globalRenderer)){
+	    std::vector<std::string> strings = {testMap[i], player.getSymbol()};
+	    if(!loadTextures(font, textures, strings, globalRenderer)){
 	      printf("Error with font loading\n");
 	    } else {
 	      SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -278,7 +283,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
 }
 
 
-bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::string str, SDL_Renderer* renderer){
+bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::vector<std::string> strings, SDL_Renderer* renderer){
   font = TTF_OpenFont("Courier Prime.ttf", 32);
   if(font == NULL){
     printf("Falied to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -287,7 +292,7 @@ bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::string 
     SDL_Color textColor = {0xFF,0xFF,0xFF};
 
     for(int i=0; i < textures.size(); i++){
-      if(!textures[i]->loadFromString(font, str, textColor, renderer)){
+      if(!textures[i]->loadFromString(font, strings[i], textColor, renderer)){
 	printf("Failed to render texture\n");
 	return false;
       }

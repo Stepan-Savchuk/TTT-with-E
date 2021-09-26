@@ -1,8 +1,9 @@
 #include<stdio.h>
 #include<string>
+#include<vector>
+
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_ttf.h>
-#include<cmath>
 
 
 
@@ -175,7 +176,7 @@ void Player::setMark(bool value){
 
 
 bool init(SDL_Window** window, SDL_Renderer** renderer);
-bool loadTextures(TTF_Font *font, WTexture* texture, std::string str, SDL_Renderer* renderer);
+bool loadTextures(TTF_Font *font, std::vector<WTexture *> textures, std::string str, SDL_Renderer* renderer);
 void input();
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
@@ -215,6 +216,8 @@ int main(int argc, char *argv[]){
   }
 
   WTexture mapTexture;
+
+  std::vector<WTexture *> textures = {&mapTexture};
   
   if(!init(&window, &globalRenderer)){
     printf("Error with init\n");
@@ -234,7 +237,7 @@ int main(int argc, char *argv[]){
 	if(toShow){
 	  SDL_RenderClear(globalRenderer);
 	  for(int i=0; i < MAP_SIZE; i++){
-	    if(!loadTextures(font, &mapTexture, testMap[i], globalRenderer)){
+	    if(!loadTextures(font, textures, testMap[i], globalRenderer)){
 	      printf("Error with font loading\n");
 	    } else {
 	      SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -275,7 +278,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
 }
 
 
-bool loadTextures(TTF_Font* font, WTexture* texture, std::string str, SDL_Renderer* renderer){
+bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::string str, SDL_Renderer* renderer){
   font = TTF_OpenFont("Courier Prime.ttf", 32);
   if(font == NULL){
     printf("Falied to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -283,10 +286,12 @@ bool loadTextures(TTF_Font* font, WTexture* texture, std::string str, SDL_Render
   } else {
     SDL_Color textColor = {0xFF,0xFF,0xFF};
 
-    if(!texture->loadFromString(font, str, textColor, renderer)){
-      printf("Failed to render texture\n");
-      return false;
-    } 
+    for(int i=0; i < textures.size(); i++){
+      if(!textures[i]->loadFromString(font, str, textColor, renderer)){
+	printf("Failed to render texture\n");
+	return false;
+      }
+    }
   }
   return true;
 }

@@ -182,7 +182,7 @@ void Player::setMark(bool value){
 
 bool init(SDL_Window** window, SDL_Renderer** renderer);
 bool loadTextures(TTF_Font *font, std::vector<WTexture *> textures, std::vector<std::string> strings, SDL_Renderer* renderer);
-void input(Player* player);
+void input(Player* player, bool &mark);
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
 
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]){
 	  quit = true;
 	}
       }
-      input(&player);
+      input(&player, toShow);
       
       if(toShow){
 	SDL_RenderClear(globalRenderer);
@@ -309,23 +309,30 @@ bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::vector<
 }
 
 
-void input(Player* player){
+void input(Player* player, bool &mark){
   const Uint8* keyState = SDL_GetKeyboardState(NULL);
-  if(keyState[SDL_SCANCODE_UP]){
-    printf("UP\n");
-    printf("\n", player.getX());
-    player->changeY(-1);
-  } else if(keyState[SDL_SCANCODE_DOWN]){
-    printf("DOWN\n");
-    player->changeY(1);
-  } else if(keyState[SDL_SCANCODE_LEFT]){
-    printf("LEFT\n");
-    player->changeX(-1);
-  } else if(keyState[SDL_SCANCODE_RIGHT]){
-    printf("RIGHT\n");
-    player->changeX(1);
-  } else {
-    printf("0\n");
+  if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_RIGHT]){
+    if(keyState[SDL_SCANCODE_UP]){
+      printf("UP\n");
+      player->changeY(-1);
+
+      mark = true;
+    } else if(keyState[SDL_SCANCODE_DOWN]){
+      printf("DOWN\n");
+
+      player->changeY(1);
+      mark = true;
+    } else if(keyState[SDL_SCANCODE_LEFT]){
+      printf("LEFT\n");
+
+      player->changeX(-1);
+      mark = true;
+    } else if(keyState[SDL_SCANCODE_RIGHT]){
+      printf("RIGHT\n");
+
+      player->changeX(1);
+      mark = true;
+    }
   }
 }
 

@@ -141,6 +141,11 @@ public:
     return name;
   }
 
+  std::string getSymbol(){
+    std::string s(1, symbol);
+    return s;
+  }
+
   bool getMark(){
     return mark;
   }
@@ -209,7 +214,7 @@ int main(int argc, char *argv[]){
     "",
   ""};
 
-  createMap(testMap, MAP_SIZE, true);
+  createMap(testMap, MAP_SIZE, false);
 
   for(int i=0; i < MAP_SIZE; i++){
     printf("%s\n", testMap[i].c_str());
@@ -227,7 +232,7 @@ int main(int argc, char *argv[]){
       
       std::vector<WTexture *> textures = {&mapTexture, &playerTexture};
       
-      Player player = {"Player", 'X', 0, 0};
+      Player player("Player", 'X', 0, 0, true);
       
       SDL_Event event;
       while(!quit){
@@ -241,13 +246,15 @@ int main(int argc, char *argv[]){
 	if(toShow){
 	  SDL_RenderClear(globalRenderer);
 	  for(int i=0; i < MAP_SIZE; i++){
-	    std::vector<std::string> strings = {testMap[i], player.getSymbol()};
+	    std::vector<std::string> strings = {testMap[i], (1, player.getSymbol())};
 	    if(!loadTextures(font, textures, strings, globalRenderer)){
 	      printf("Error with font loading\n");
 	    } else {
 	      SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
 
+	      
 	      mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
+	      playerTexture.render(0,0,globalRenderer);
 
 	      SDL_RenderPresent(globalRenderer);
 	    }

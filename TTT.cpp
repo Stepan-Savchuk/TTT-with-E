@@ -182,7 +182,7 @@ void Player::setMark(bool value){
 
 bool init(SDL_Window** window, SDL_Renderer** renderer);
 bool loadTextures(TTF_Font *font, std::vector<WTexture *> textures, std::vector<std::string> strings, SDL_Renderer* renderer);
-void input();
+void input(Player* player);
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
 
@@ -209,59 +209,59 @@ int main(int argc, char *argv[]){
   SDL_Renderer* globalRenderer;
 
   TTF_Font* font = NULL;
-
-  std::string testMap[] = {"",
-    "",
-  ""};
-
-  createMap(testMap, MAP_SIZE, false);
-
-  for(int i=0; i < MAP_SIZE; i++){
-    printf("%s\n", testMap[i].c_str());
-  }
-
   
   if(!init(&window, &globalRenderer)){
     printf("Error with init\n");
   } else {
-      bool quit = false;
-      bool toShow = true;
+    std::string testMap[] = {"",
+      "",
+      ""};
 
-      WTexture mapTexture;
-      WTexture playerTexture;
+    createMap(testMap, MAP_SIZE, false);
+    
+    bool quit = false;
+    bool toShow = true;
+
+    WTexture mapTexture;
+    WTexture playerTexture;
+    
+    std::vector<WTexture *> textures = {&mapTexture, &playerTexture};
       
-      std::vector<WTexture *> textures = {&mapTexture, &playerTexture};
+    Player player("PlayerOne", 'X', 0, 0, true);
       
-      Player player("Player", 'X', 0, 0, true);
-      
-      SDL_Event event;
-      while(!quit){
-	while(SDL_PollEvent(&event) != 0){
-	  if(event.type == SDL_QUIT){
-	    quit = true;
-	  }
-	}
-	input();
-
-	if(toShow){
-	  SDL_RenderClear(globalRenderer);
-	  for(int i=0; i < MAP_SIZE; i++){
-	    std::vector<std::string> strings = {testMap[i], (1, player.getSymbol())};
-	    if(!loadTextures(font, textures, strings, globalRenderer)){
-	      printf("Error with font loading\n");
-	    } else {
-	      SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
-
-	      
-	      mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
-	      playerTexture.render(0,0,globalRenderer);
-
-	      SDL_RenderPresent(globalRenderer);
-	    }
-	  }
-	  toShow = false;
+    SDL_Event event;
+    
+    while(!quit){
+      while(SDL_PollEvent(&event) != 0){
+	if(event.type == SDL_QUIT){
+	  quit = true;
 	}
       }
+      input(&player);
+      
+      if(toShow){
+	SDL_RenderClear(globalRenderer);
+	
+	for(int i=0; i < MAP_SIZE; i++){
+	  
+	  std::vector<std::string> strings = {testMap[i], (1, player.getSymbol())};
+	  
+	  if(!loadTextures(font, textures, strings, globalRenderer)){
+	    printf("Error with font loading\n");
+	  } else {
+	    
+	    SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+	    
+	      
+	    mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
+	    playerTexture.render(player.getX()*25, player.getY()*25, globalRenderer);
+
+	    SDL_RenderPresent(globalRenderer);
+	  }
+	}
+	toShow = false;
+      }
+    }
   }
   close(window, globalRenderer, font);
   
@@ -309,16 +309,21 @@ bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::vector<
 }
 
 
-void input(){
+void input(Player* player){
   const Uint8* keyState = SDL_GetKeyboardState(NULL);
   if(keyState[SDL_SCANCODE_UP]){
     printf("UP\n");
+    printf("\n", player.getX());
+    player->changeY(-1);
   } else if(keyState[SDL_SCANCODE_DOWN]){
     printf("DOWN\n");
+    player->changeY(1);
   } else if(keyState[SDL_SCANCODE_LEFT]){
     printf("LEFT\n");
+    player->changeX(-1);
   } else if(keyState[SDL_SCANCODE_RIGHT]){
     printf("RIGHT\n");
+    player->changeX(1);
   } else {
     printf("0\n");
   }

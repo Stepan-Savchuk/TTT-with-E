@@ -236,8 +236,9 @@ int main(int argc, char *argv[]){
 	if(event.type == SDL_QUIT){
 	  quit = true;
 	}
+	input(&player, toShow);
       }
-      input(&player, toShow);
+      
       
       if(toShow){
 	SDL_RenderClear(globalRenderer);
@@ -311,28 +312,28 @@ bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::vector<
 
 void input(Player* player, bool &mark){
   const Uint8* keyState = SDL_GetKeyboardState(NULL);
-  if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_RIGHT]){
+  bool isPressed =  false;
+  if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_RIGHT] && !isPressed){
     if(keyState[SDL_SCANCODE_UP]){
       printf("UP\n");
       player->changeY(-1);
 
-      mark = true;
+      
     } else if(keyState[SDL_SCANCODE_DOWN]){
       printf("DOWN\n");
 
       player->changeY(1);
-      mark = true;
     } else if(keyState[SDL_SCANCODE_LEFT]){
       printf("LEFT\n");
 
       player->changeX(-1);
-      mark = true;
     } else if(keyState[SDL_SCANCODE_RIGHT]){
       printf("RIGHT\n");
 
       player->changeX(1);
-      mark = true;
     }
+    mark = true;
+    isPressed = true;
   }
 }
 

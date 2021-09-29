@@ -6,8 +6,8 @@
 #include<SDL2/SDL_ttf.h>
 
 
-const int MAP_SIZE = 3;
-const int SCREEN_WIDTH = MAP_SIZE * 19;
+const int MAP_SIZE = 18;
+const int SCREEN_WIDTH = MAP_SIZE * 25;
 const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
 
@@ -213,9 +213,7 @@ int main(int argc, char *argv[]){
   if(!init(&window, &globalRenderer)){
     printf("Error with init\n");
   } else {
-    std::string testMap[] = {"",
-      "",
-      ""};
+    std::string testMap[MAP_SIZE];
 
     createMap(testMap, MAP_SIZE, false);
     
@@ -277,14 +275,25 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
     printf("SDL couldn't initialize! SDL Error %s\n", SDL_GetError());
     return false;
   } else {
-    if(SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE, window, renderer) != 0){
+    /*if(SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE, window, renderer) != 0){
       printf("Unable to create window and default renderer! SDL Error: %s\n", SDL_GetError());
       return false;
+      }*/
+    *window = SDL_CreateWindow("TTT", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    if(*window == NULL){
+      printf("Unable to create window! SDL Error: %s\n", SDL_GetError());
+      return false;
     } else {
-      SDL_SetRenderDrawColor(*renderer, 0x00, 0x00, 0x00, 0xFF);
-      if(TTF_Init() == -1) {
-	printf("SDL_ttf couldn't initialize! SDL Error: %s\n", TTF_GetError());
+      *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+      if(*renderer == NULL){
+	printf("Unable to create renderer! SDL Error: %s\n", SDL_GetError());
 	return false;
+      } else {
+	SDL_SetRenderDrawColor(*renderer, 0x00, 0x00, 0x00, 0xFF);
+	if(TTF_Init() == -1) {
+	  printf("SDL_ttf couldn't initialize! SDL Error: %s\n", TTF_GetError());
+	  return false;
+	}
       }
     }
   }

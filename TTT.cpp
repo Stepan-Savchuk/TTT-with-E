@@ -6,10 +6,10 @@
 #include<SDL2/SDL_ttf.h>
 
 
-
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
 const int MAP_SIZE = 3;
+const int SCREEN_WIDTH = MAP_SIZE * 19;
+const int SCREEN_HEIGHT = MAP_SIZE * 25;
+
 
 
 

@@ -1,4 +1,6 @@
-OBJS = TTT.cpp
+.PHONY: all install
+
+OBJS = src/TTT.cpp
 
 CC = g++
 
@@ -10,7 +12,13 @@ COMPILER_FLAGS = -w -Wl,-subsystem,windows
 
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -static-libgcc -static-libstdc++ -Wl,-Bstatic -lpthread
 
-OBJ_NAME = TTT
+EXE_PATH = build
+
+EXE_NAME = $(EXE_PATH)/TTT
 
 all : $(OBJS)
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE_NAME)
+
+install: $(OBJS)
+	EXE_PATH=release
+	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(EXE_NAME)

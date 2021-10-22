@@ -1,6 +1,8 @@
-.PHONY: all install
+.PHONY: all install clean
 
-OBJS = src/TTT.cpp
+SRCS = src/TTT.cpp
+
+OBJS = $(SRCS:.cpp=.o)
 
 CC = g++
 
@@ -17,8 +19,17 @@ EXE_PATH = build
 EXE_NAME = $(EXE_PATH)/TTT
 
 all : $(OBJS)
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE_NAME)
+	$(CC) $< $(LIBRARY_PATHS) $(LINKER_FLAGS) -o $(EXE_NAME)
 
-install: $(OBJS)
+
+$(OBJS) : $(SRCS)
+	$(CC) -c $< $(INCLUDE_PATHS) -o $@
+
+
+install : $(OBJS)
 	EXE_PATH=release
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(EXE_NAME)
+	$(CC) $< $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(EXE_NAME)
+
+
+clean : 
+	rm -rf $(OBJS) $(EXE_NAME)

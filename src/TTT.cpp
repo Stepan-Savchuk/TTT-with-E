@@ -11,8 +11,6 @@ const int SCREEN_WIDTH = MAP_SIZE * 25;
 const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
 
-
-
 class WTexture {
 private:
   SDL_Texture* texture;
@@ -27,6 +25,14 @@ public:
   bool loadFromString(TTF_Font *font, std::string str, SDL_Color textColor, SDL_Renderer* renderer);
 
   void render(int x, int y, SDL_Renderer* renderer);
+
+  void setBlendMode(SDL_BlendMode blending){
+    SDL_SetTextureBlendMode(texture, blending);
+  }
+
+  void setAlpha(Uint8 alpha){
+    SDL_SetTextureAlphaMod(texture, alpha);
+  }
 
   int getWidth(){
     return width;
@@ -229,6 +235,8 @@ int main(int argc, char *argv[]){
     Player playerTwo("PlayerTwo", 'O', 0, 0, false);
       
     SDL_Event event;
+
+    int count = 0;
     
     while(!quit){
       while(SDL_PollEvent(&event) != 0){
@@ -254,13 +262,21 @@ int main(int argc, char *argv[]){
 	    
 	      
 	    mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
-	    playerTexture.render(player.getX()*25, player.getY()*25, globalRenderer);
+	    
 
 	    SDL_RenderPresent(globalRenderer);
 	  }
 	}
 	toShow = false;
       }
+      count++;
+      playerTexture.setBlendMode(SDL_BLENDMODE_BLEND);
+      if(count%4==0){
+	playerTexture.setAlpha(100);
+      } else {
+	playerTexture.setAlpha(0);
+      }
+      playerTexture.render(player.getX()*25, player.getY()*25, globalRenderer);
     }
   }
   close(window, globalRenderer, font);
@@ -376,3 +392,5 @@ void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font){
 
   SDL_Quit();
 }
+
+

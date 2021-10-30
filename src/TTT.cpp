@@ -262,6 +262,7 @@ int main(int argc, char *argv[]){
 	    
 	      
 	    mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
+	    playerTexture.render(player.getX(), player.getY()*25, globalRenderer);
 	    
 
 	    SDL_RenderPresent(globalRenderer);
@@ -269,14 +270,6 @@ int main(int argc, char *argv[]){
 	}
 	toShow = false;
       }
-      count++;
-      playerTexture.setBlendMode(SDL_BLENDMODE_BLEND);
-      if(count%4==0){
-	playerTexture.setAlpha(100);
-      } else {
-	playerTexture.setAlpha(0);
-      }
-      playerTexture.render(player.getX()*25, player.getY()*25, globalRenderer);
     }
   }
   close(window, globalRenderer, font);
@@ -388,6 +381,7 @@ void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font){
   SDL_DestroyWindow(window);
   window = NULL;
 
+  TTF_CloseFont(font);
   font = NULL;
 
   SDL_Quit();

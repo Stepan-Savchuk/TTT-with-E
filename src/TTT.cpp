@@ -7,7 +7,7 @@
 
 
 const int MAP_SIZE = 18;
-const int SCREEN_WIDTH = MAP_SIZE * 25;
+const int SCREEN_WIDTH = MAP_SIZE * 19;
 const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
 
@@ -237,6 +237,9 @@ int main(int argc, char *argv[]){
     SDL_Event event;
 
     int count = 0;
+
+    playerTexture.setBlendMode(SDL_BLENDMODE_BLEND);
+    playerTexture.setAlpha(100);
     
     while(!quit){
       while(SDL_PollEvent(&event) != 0){
@@ -246,30 +249,27 @@ int main(int argc, char *argv[]){
 	input(&player, testMap, toShow);
       }
       
-      
-      if(toShow){
-	SDL_RenderClear(globalRenderer);
+      SDL_RenderClear(globalRenderer);
+      for(int i=0; i < MAP_SIZE; i++){
+	  
+	std::vector<std::string> strings = {testMap[i], (1, player.getSymbol())};
 	
-	for(int i=0; i < MAP_SIZE; i++){
-	  
-	  std::vector<std::string> strings = {testMap[i], (1, player.getSymbol())};
-	  
-	  if(!loadTextures(font, textures, strings, globalRenderer)){
-	    printf("Error with font loading\n");
+	if(!loadTextures(font, textures, strings, globalRenderer)){
+	  printf("Error with font loading\n");
+	} else {
+	  //int width = getWidth(&font);
+	  SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+	  if(count%32==0){
+	    playerTexture.setAlpha(0);
 	  } else {
-	    
-	    SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
-	    
-	      
-	    mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
-	    playerTexture.render(player.getX(), player.getY()*25, globalRenderer);
-	    
-
-	    SDL_RenderPresent(globalRenderer);
+	    playerTexture.setAlpha(100);
 	  }
+	  count++;
+	  mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
+	  playerTexture.render(player.getX()*19, player.getY()*25, globalRenderer);
 	}
-	toShow = false;
       }
+      SDL_RenderPresent(globalRenderer);
     }
   }
   close(window, globalRenderer, font);

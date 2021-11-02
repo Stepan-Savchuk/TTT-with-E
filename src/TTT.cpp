@@ -11,6 +11,11 @@ const int SCREEN_WIDTH = MAP_SIZE * 19;
 const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
 
+
+
+
+
+
 class WTexture {
 private:
   SDL_Texture* texture;
@@ -186,11 +191,41 @@ void Player::setMark(bool value){
 
 
 
+
+
+
+
+
+
+
+
+
+
 bool init(SDL_Window** window, SDL_Renderer** renderer);
 bool loadTextures(TTF_Font *font, std::vector<WTexture *> textures, std::vector<std::string> strings, SDL_Renderer* renderer);
 void input(Player* player, std::string (&testMap)[MAP_SIZE], bool &mark);
 void createMap(std::string strArr[MAP_SIZE], bool toFill, int size);
+void render(SDL_Renderer** renderer, TTF_Font* font, std::string (&map)[MAP_SIZE], Player* currentPlayer, std::vector<WTexture *> textures, int* count);
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -208,6 +243,38 @@ void createMap(std::string strArr[MAP_SIZE], int size, bool toFill){
     }
   }
 }
+
+
+
+
+void render(SDL_Renderer** renderer, TTF_Font* font, std::string map, Player* currentPlayer, std::vector<WTexture *> textures, int* count){
+  SDL_RenderClear(*renderer);
+  for(int i=0; i < MAP_SIZE; i++){
+	  
+    std::vector<std::string> strings = {map[i], (1, currentPlayer->getSymbol())};
+	
+    if(!loadTextures(font, textures, strings, *renderer)){
+      printf("Error with font loading\n");
+    } else {
+      SDL_SetRenderDrawColor(*renderer, 0x00, 0x00, 0x00, 0xFF);
+      if(*count%32==0){
+	textures[1]->setAlpha(0);
+      } else {
+	textures[1]->setAlpha(100);
+      }
+      *count++;
+      textures[0]->render(0, i*25, *renderer);//25 is const value to make multiline drawing
+      textures[1]->render(currentPlayer->getX()*19, currentPlayer->getY()*25, *renderer);
+    }
+  }
+  SDL_RenderPresent(*renderer);
+}
+
+
+
+
+
+
 
 
 int main(int argc, char *argv[]){
@@ -249,34 +316,14 @@ int main(int argc, char *argv[]){
 	input(&player, testMap, toShow);
       }
       
-      SDL_RenderClear(globalRenderer);
-      for(int i=0; i < MAP_SIZE; i++){
-	  
-	std::vector<std::string> strings = {testMap[i], (1, player.getSymbol())};
-	
-	if(!loadTextures(font, textures, strings, globalRenderer)){
-	  printf("Error with font loading\n");
-	} else {
-	  //int width = getWidth(&font);
-	  SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
-	  if(count%32==0){
-	    playerTexture.setAlpha(0);
-	  } else {
-	    playerTexture.setAlpha(100);
-	  }
-	  count++;
-	  mapTexture.render(0, i*25, globalRenderer);//const value to make multiline drawing
-	  playerTexture.render(player.getX()*19, player.getY()*25, globalRenderer);
-	}
-      }
-      SDL_RenderPresent(globalRenderer);
+      render(&globalRenderer, font, testMap, &player, textures, &count);
     }
   }
   close(window, globalRenderer, font);
   
   return 0;
 }
-
+//Render arguments: SDL_Renderer* renderer, string strings, Player currentPlayer, TTF_Font* font, std::vector<WTexture *> textures
 
 
 bool init(SDL_Window** window, SDL_Renderer** renderer){
@@ -372,6 +419,8 @@ void input(Player* player, std::string (&testMap)[MAP_SIZE], bool &mark){
     isPressed = true;
   }
 }
+
+
 
 
 void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font){

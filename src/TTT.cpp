@@ -247,7 +247,7 @@ void createMap(std::string strArr[MAP_SIZE], int size, bool toFill){
 
 
 
-void render(SDL_Renderer** renderer, TTF_Font* font, std::string map, Player* currentPlayer, std::vector<WTexture *> textures, int* count){
+void render(SDL_Renderer** renderer, TTF_Font* font, std::string (&map)[MAP_SIZE], Player* currentPlayer, std::vector<WTexture *> textures, int* count){
   SDL_RenderClear(*renderer);
   for(int i=0; i < MAP_SIZE; i++){
 	  

@@ -12,7 +12,7 @@ const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
 
 
-
+//Goals for 06.11.2021 -- refactoring of code(With expanding of Player class)
 
 
 
@@ -136,9 +136,12 @@ private:
   std::string name;
   char symbol;
   Position position;
+  WTexture texture;
   bool mark;
 public:
   Player(std::string name, char symbol, int x, int y, bool mark);
+
+  bool createTexture(SDL_Renderer* renderer, TTF_Font* font, SDL_Color color, SDL_BlendMode blending);
 
   int getX(){
     return position.getX();
@@ -175,6 +178,12 @@ Player::Player(std::string name, char symbol, int x, int y, bool mark){
   this->name = name;
   this->symbol = symbol;
   this->mark = mark;
+}
+
+bool Player::createTexture(SDL_Renderer* renderer, TTF_Font* font, SDL_Color color, SDL_BlendMode blending){
+  texture.setBlendMode(blending);
+  std::string stringSymbol = std::string(symbol, 1);
+  return texture.loadFromString(font, stringSymbol, color, renderer);
 }
 
 void Player::changeX(int value){

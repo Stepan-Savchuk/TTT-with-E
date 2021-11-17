@@ -6,7 +6,7 @@
 #include<SDL2/SDL_ttf.h>
 
 
-const int MAP_SIZE = 18;
+const int MAP_SIZE = 10;
 const int SCREEN_WIDTH = MAP_SIZE * 19;
 const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
@@ -131,6 +131,39 @@ void Position::setY(int value){
 
 
 
+
+
+
+
+
+class Map{
+private:
+  WTexture texture;
+  std::string text;
+public:
+  void full();
+  void createMap(bool toFill){
+  for(int i=0; i < size; i++){
+    if(strArr[i] != ""){
+      strArr[i] = "";
+    }
+    for(int j=0; j < size; j++){
+      if(toFill){
+	strArr[i] += 'O';
+      } else {
+	strArr[i] += ' ';
+      }
+    }
+  }
+  }
+};
+
+
+
+
+
+
+
 class Player{
 private:
   std::string name;
@@ -142,6 +175,8 @@ public:
   Player(std::string name, char symbol, int x, int y, bool mark);
 
   bool createTexture(SDL_Renderer* renderer, TTF_Font* font, SDL_Color color, SDL_BlendMode blending);
+
+  void render(SDL_Renderer* renderer);
 
   int getX(){
     return position.getX();
@@ -184,6 +219,10 @@ bool Player::createTexture(SDL_Renderer* renderer, TTF_Font* font, SDL_Color col
   texture.setBlendMode(blending);
   std::string stringSymbol = std::string(symbol, 1);
   return texture.loadFromString(font, stringSymbol, color, renderer);
+}
+
+void Player::render(SDL_Renderer* renderer){
+  texture.render(position.getX(), position.getY(), renderer);
 }
 
 void Player::changeX(int value){
@@ -238,25 +277,12 @@ void close(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font);
 
 
 
-void createMap(std::string strArr[MAP_SIZE], int size, bool toFill){
-  for(int i=0; i < size; i++){
-    if(strArr[i] != ""){
-      strArr[i] = "";
-    }
-    for(int j=0; j < size; j++){
-      if(toFill){
-	strArr[i] += 'O';
-      } else {
-	strArr[i] += ' ';
-      }
-    }
-  }
-}
+/**/
 
 
 
 
-void render(SDL_Renderer** renderer, TTF_Font* font, std::string (&map)[MAP_SIZE], Player* currentPlayer, std::vector<WTexture *> textures, int* count){
+void render(SDL_Renderer** renderer, TTF_Font* font, , Player* currentPlayer, std::vector<WTexture *> textures, int* count){
   SDL_RenderClear(*renderer);
   for(int i=0; i < MAP_SIZE; i++){
 	  
@@ -297,7 +323,7 @@ int main(int argc, char *argv[]){
   } else {
     std::string testMap[MAP_SIZE];
 
-    createMap(testMap, MAP_SIZE, false);
+    createMap(testMap, MAP_SIZE, true);
     
     bool quit = false;
     bool toShow = true;
@@ -366,7 +392,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer){
 }
 
 
-bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::vector<std::string> strings, SDL_Renderer* renderer){
+bool loadTextures(TTF_Font* font, SDL_Renderer* renderer){
   font = TTF_OpenFont("Courier Prime.ttf", 32);
   if(font == NULL){
     printf("Falied to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -385,7 +411,7 @@ bool loadTextures(TTF_Font* font, std::vector<WTexture *> textures, std::vector<
 }
 
 
-void input(Player* player, std::string (&testMap)[MAP_SIZE], bool &mark){
+void input(Player* player, Map* map, bool &mark){
   const Uint8* keyState = SDL_GetKeyboardState(NULL);
   bool isPressed =  false;
   if(keyState[SDL_SCANCODE_UP] || keyState[SDL_SCANCODE_DOWN] || keyState[SDL_SCANCODE_LEFT] || keyState[SDL_SCANCODE_RIGHT] || keyState[SDL_SCANCODE_RETURN] && !isPressed){
@@ -422,7 +448,7 @@ void input(Player* player, std::string (&testMap)[MAP_SIZE], bool &mark){
     }
     if(keyState[SDL_SCANCODE_RETURN]){
       printf("ENTER\n");
-      testMap[player->getY()][player->getX()] = player->getSymbol()[0];
+      ;
     }
     mark = true;
     isPressed = true;

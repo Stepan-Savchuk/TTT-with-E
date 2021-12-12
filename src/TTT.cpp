@@ -143,18 +143,18 @@ private:
 public:
   void full();
   void createMap(bool toFill){
-  for(int i=0; i < size; i++){
-    if(strArr[i] != ""){
-      strArr[i] = "";
-    }
-    for(int j=0; j < size; j++){
-      if(toFill){
-	strArr[i] += 'O';
-      } else {
-	strArr[i] += ' ';
+    for(int i=0; i < MAP_SIZE; i++){
+      if(text[i] != ""){
+	text[i] = "";
+      }
+      for(int j=0; j < MAP_SIZE; j++){
+	if(toFill){
+	  strArr[i] += 'O';
+	} else {
+	  strArr[i] += ' ';
+	}
       }
     }
-  }
   }
 };
 

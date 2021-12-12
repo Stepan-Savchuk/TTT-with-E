@@ -12,12 +12,12 @@ const int SCREEN_HEIGHT = MAP_SIZE * 25;
 
 
 
-//Goals for 06.11.2021 -- refactoring of code(With expanding of Player class)
+ //Goals for 06.11.2021 -- refactoring of code(With expanding of Player class)
 
 
 
 class WTexture {
-private:
+ private:
   SDL_Texture* texture;
   int width;
   int height;

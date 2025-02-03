@@ -1,13 +1,17 @@
 function love.load()
   X_sprite = love.graphics.newImage("X2.png")
   O_sprite = love.graphics.newImage("O2.png")
+  
   Grid = {}
+  
   for i = 0, 2, 1 do
     Grid[i] = {}
     for j = 0, 2, 1 do
       Grid[i][j] = "NIL"
     end
   end
+
+  Turn = "X"
 end
 
 
@@ -21,6 +25,9 @@ function love.draw()
       if Grid[i][j] == "X" then
         love.graphics.draw(X_sprite, (i*128), (j*128))
       end
+      if Grid[i][j] == "O" then
+        love.graphics.draw(O_sprite, (i*128), (j*128))
+      end
     end
   end
 end
@@ -32,11 +39,18 @@ function love.keypressed(key)
 end
 
 function love.mousepressed(x, y, button, istouch)
+  local tx = math.floor(x / 128)
+  local ty = math.floor(y / 128)
+
   if button == 1 then
-    local tx = math.floor(x / 128)
-    print(tx)
-    local ty = math.floor(y / 128)
-    print(ty)
-    Grid[tx][ty] = "X"
+    Grid[tx][ty] = Turn
+    if Turn == "X" then
+      Turn = "O"
+    else
+      Turn = "X"
+    end
+  end
+  if button == 2 then
+    Grid[tx][ty] = "NIL"
   end
 end

@@ -1,9 +1,11 @@
+--TODO: limit ERASER usage times
+
 function love.load()
-  X_sprite = love.graphics.newImage("X2.png")
+X_sprite = love.graphics.newImage("X2.png")
   O_sprite = love.graphics.newImage("O2.png")
-  
+
   Grid = {}
-  
+
   for i = 0, 2, 1 do
     Grid[i] = {}
     for j = 0, 2, 1 do
@@ -19,6 +21,8 @@ function love.draw()
   for i = 0, 2, 1 do
     love.graphics.line((129+(129*i)), 0, (129+(129*i)), (129*3))
     love.graphics.line(0, (129+(129*i)), (129*3), (129+(129*i)))
+    local testString = "Player " ..Turn
+    love.graphics.print(testString, (129*3)+64, 32, 0, 4, 4)
   end
   for i = 0, 2, 1 do
     for j = 0, 2, 1 do
@@ -39,18 +43,22 @@ function love.keypressed(key)
 end
 
 function love.mousepressed(x, y, button, istouch)
-  local tx = math.floor(x / 128)
-  local ty = math.floor(y / 128)
+  if x < (129*3) and y < (129*3) then
+    local tx = math.floor(x / 128)
+    local ty = math.floor(y / 128)
 
-  if button == 1 then
-    Grid[tx][ty] = Turn
-    if Turn == "X" then
-      Turn = "O"
-    else
-      Turn = "X"
+    if button == 1 then
+      if Grid[tx][ty] == "NIL" then
+        Grid[tx][ty] = Turn
+        if Turn == "X" then
+          Turn = "O"
+        else
+          Turn = "X"
+        end
+      end
     end
-  end
-  if button == 2 then
-    Grid[tx][ty] = "NIL"
+    if button == 2 then
+      Grid[tx][ty] = "NIL"
+    end
   end
 end

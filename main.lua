@@ -1,4 +1,4 @@
---TODO: limit ERASER usage times
+--TODO: check for win/draw
 
 function love.load()
 X_sprite = love.graphics.newImage("X2.png")
@@ -14,15 +14,20 @@ X_sprite = love.graphics.newImage("X2.png")
   end
 
   Turn = "X"
+  X_Eraser = 1
+  O_Eraser = 1
 end
 
 
 function love.draw()
+  local testString = "Player " ..Turn
+  love.graphics.print(testString, (129*3)+64, 32, 0, 4, 4)
+  love.graphics.print("X Eraser left" ..X_Eraser, (129*3)+64, 64, 0, 4, 4)
+  love.graphics.print("O Eraser left" ..O_Eraser, (129*3)+64, 96, 0, 4, 4)
+
   for i = 0, 2, 1 do
     love.graphics.line((129+(129*i)), 0, (129+(129*i)), (129*3))
     love.graphics.line(0, (129+(129*i)), (129*3), (129+(129*i)))
-    local testString = "Player " ..Turn
-    love.graphics.print(testString, (129*3)+64, 32, 0, 4, 4)
   end
   for i = 0, 2, 1 do
     for j = 0, 2, 1 do
@@ -58,6 +63,17 @@ function love.mousepressed(x, y, button, istouch)
       end
     end
     if button == 2 then
+      if Turn == "X" then
+        if X_Eraser <= 0 then
+          return
+        end
+        X_Eraser = X_Eraser - 1
+      else
+        if O_Eraser <= 0 then
+          return
+        end
+        O_Eraser = O_Eraser - 1
+      end
       Grid[tx][ty] = "NIL"
     end
   end

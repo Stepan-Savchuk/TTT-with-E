@@ -1,4 +1,4 @@
---TODO: check for win/draw
+--polish check for win(disable any action after win)
 
 function love.load()
 X_sprite = love.graphics.newImage("X2.png")
@@ -60,7 +60,7 @@ function love.mousepressed(x, y, button, istouch)
     if button == 1 then
       if Grid[tx][ty] == "NIL" then
         Grid[tx][ty] = Turn
-        if (Grid[0][0] == Turn and Grid[1][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[0][1] == Turn and Grid[0][2] == Turn) or (Grid[1][0] == Turn and Grid[1][1] == Turn and Grid[1][2] == Turn) or (Grid[2][0] == Turn and Grid[2][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[1][0] == Turn and Grid[2][0] == Turn) or (Grid[0][1] == Turn and Grid[1][1] == Turn and Grid[2][1] == Turn) or (Grid[0][2] == Turn and Grid[1][2] == Turn and Grid[2][2] == Turn) then
+        if (Grid[0][0] == Turn and Grid[1][1] == Turn and Grid[2][2] ==) Turn) or (Grid[0][0] == Turn and Grid[0][1] == Turn and Grid[0][2] == Turn) or (Grid[1][0] == Turn and Grid[1][1] == Turn and Grid[1][2] == Turn) or (Grid[2][0] == Turn and Grid[2][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[1][0] == Turn and Grid[2][0] == Turn) or (Grid[0][1] == Turn and Grid[1][1] == Turn and Grid[2][1] == Turn) or (Grid[0][2] == Turn and Grid[1][2] == Turn and Grid[2][2] == Turn) then
           Win = true
           return
         end

@@ -16,6 +16,8 @@ X_sprite = love.graphics.newImage("X2.png")
   Turn = "X"
   X_Eraser = 1
   O_Eraser = 1
+
+  Win = false
 end
 
 
@@ -39,6 +41,9 @@ function love.draw()
       end
     end
   end
+  if Win then
+    love.graphics.print("WIIIN of someone... maybe? I think so?", 129*3, 129*2, 0, 8, 8)
+  end
 end
 
 function love.keypressed(key)
@@ -55,6 +60,10 @@ function love.mousepressed(x, y, button, istouch)
     if button == 1 then
       if Grid[tx][ty] == "NIL" then
         Grid[tx][ty] = Turn
+        if (Grid[0][0] == Turn and Grid[1][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[0][1] == Turn and Grid[0][2] == Turn) or (Grid[1][0] == Turn and Grid[1][1] == Turn and Grid[1][2] == Turn) or (Grid[2][0] == Turn and Grid[2][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[1][0] == Turn and Grid[2][0] == Turn) or (Grid[0][1] == Turn and Grid[1][1] == Turn and Grid[2][1] == Turn) or (Grid[0][2] == Turn and Grid[1][2] == Turn and Grid[2][2] == Turn) then
+          Win = true
+          return
+        end
         if Turn == "X" then
           Turn = "O"
         else

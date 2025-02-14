@@ -1,4 +1,4 @@
---make state system for cleaner change between menu/game/aftermath and add a menu
+--make AI to play with player
 
 function love.load()
   X_sprite = love.graphics.newImage("X2.png")

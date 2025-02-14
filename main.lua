@@ -1,4 +1,4 @@
---add a menu
+--make state system for cleaner change between menu/game/aftermath and add a menu
 
 function love.load()
   X_sprite = love.graphics.newImage("X2.png")
@@ -19,16 +19,25 @@ function love.load()
 
   Win = false
   InGame = true
+
+  State = 0 -- 0 - menu, 1 - game, 2 - aftermath
 end
 
 function love.update()
   if Win then
-    InGame = false
+    State = 2
   end
 end
 
 function love.draw()
-  if InGame then
+  if State == 0 then
+    love.graphics.print("Press Start to start", 64, 64, 0, 2, 2)
+    love.graphics.print("Press RMB to erase opponents(or yours) figure on board", 64, 128, 0, 2, 2)
+    love.graphics.print("I think you know how to play Tic-Tac-Toe, don't you?", 64, 192, 0, 2, 2)
+    love.graphics.print("Press q to quit, but why would you need that", 64, 256, 0, 2,2)
+  end
+
+  if State == 1 then
   
     local testString = "Player " ..Turn
     love.graphics.print(testString, (129*3)+64, 32, 0, 4, 4)
@@ -50,20 +59,25 @@ function love.draw()
       end
     end
   end
-  if Win then
+  if State == 2 then
     love.graphics.clear()
     love.graphics.print("WIIIN of someone... maybe? I think so?", 64, 129*2, 0, 3, 3)
    end
 end
 
 function love.keypressed(key)
+  if State == 0 then
+    if key == 's' then
+      State = 1
+    end
+  end
   if key == 'q' then
     love.event.quit(0)
   end
 end
 
 function love.mousepressed(x, y, button, istouch)
-  if InGame then
+  if State == 1 then
     if x < (129*3) and y < (129*3) then
       local tx = math.floor(x / 128)
       local ty = math.floor(y / 128)

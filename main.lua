@@ -27,10 +27,14 @@ function love.load()
   State = 0 -- 0 - menu, 1 - game, 2 - aftermath
 end
 
-function love.update()
+function event_handler()
   if Win then
     State = 2
   end
+end
+
+function love.update()
+  event_handler()
 end
 
 function love.draw()
@@ -86,34 +90,51 @@ function love.mousepressed(x, y, button, istouch)
       local tx = math.floor(x / 128)
       local ty = math.floor(y / 128)
 
-      if button == 1 then
-        if Grid[tx][ty] == "NIL" then
-          Grid[tx][ty] = Turn
-          if (Grid[0][0] == Turn and Grid[1][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[0][1] == Turn and Grid[0][2] == Turn) or (Grid[1][0] == Turn and Grid[1][1] == Turn and Grid[1][2] == Turn) or (Grid[2][0] == Turn and Grid[2][1] == Turn and Grid[2][2] == Turn) or (Grid[0][0] == Turn and Grid[1][0] == Turn and Grid[2][0] == Turn) or (Grid[0][1] == Turn and Grid[1][1] == Turn and Grid[2][1] == Turn) or (Grid[0][2] == Turn and Grid[1][2] == Turn and Grid[2][2] == Turn) then
-            Win = true
-            return
+      if Turn == "X" then
+        
+        if button == 1 then
+          if Grid[tx][ty] == "NIL" then
+            Grid[tx][ty] = Turn
+            if check4win() then  
+              Win = true
+              return
+            end
+            if Turn == "X" then
+              ai()
+              if check4win() then
+                Win = true
+                return
+              end
+            end
           end
+        end
+        if button == 2 then
           if Turn == "X" then
-            Turn = "O"
-          else
-            Turn = "X"
+            if X_Eraser <= 0 then
+              return
+            end
+            X_Eraser = X_Eraser - 1
           end
+          Grid[tx][ty] = "NIL"
         end
-      end
-      if button == 2 then
-        if Turn == "X" then
-          if X_Eraser <= 0 then
-            return
-          end
-          X_Eraser = X_Eraser - 1
-        else
-          if O_Eraser <= 0 then
-            return
-          end
-          O_Eraser = O_Eraser - 1
-        end
-        Grid[tx][ty] = "NIL"
       end
     end
+  end
+end
+
+function ai()
+  for i = 0, 2, 1 do
+    for j = 0, 2, 1 do
+      if Grid[i][j] == "NIL" then
+        Grid[i][j] = "O"
+        return
+      end
+    end
+  end
+end
+
+function check4win()
+  if ((Grid[0][0] == "X" and Grid[1][1] == "X" and Grid[2][2] == "X") or (Grid[0][0] == "X" and Grid[0][1] == "X" and Grid[0][2] == "X") or (Grid[1][0] == "X" and Grid[1][1] == "X" and Grid[1][2] == "X") or (Grid[2][0] == "X" and Grid[2][1] == "X" and Grid[2][2] == "X") or (Grid[0][0] == "X" and Grid[1][0] == "X" and Grid[2][0] == "X") or (Grid[0][1] == "X" and Grid[1][1] == "X" and Grid[2][1] == "X") or (Grid[0][2] == "X" and Grid[1][2] == "X" and Grid[2][2] == "X")) or ((Grid[0][0] == "O" and Grid[1][1] == "O" and Grid[2][2] == "O") or (Grid[0][0] == "O" and Grid[0][1] == "O" and Grid[0][2] == "O") or (Grid[1][0] == "O" and Grid[1][1] == "O" and Grid[1][2] == "O") or (Grid[2][0] == "O" and Grid[2][1] == "O" and Grid[2][2] == "O") or (Grid[0][0] == "O" and Grid[1][0] == "O" and Grid[2][0] == "O") or (Grid[0][1] == "O" and Grid[1][1] == "O" and Grid[2][1] == "O") or (Grid[0][2] == "O" and Grid[1][2] == "O" and Grid[2][2] == "O")) then
+    return true
   end
 end

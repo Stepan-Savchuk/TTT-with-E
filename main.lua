@@ -1,4 +1,8 @@
---make AI to play with player
+--make AI to play with player(fix it)
+--
+--Second-rate adapt grid to be have more than 3x3 tiles
+--
+--Third-rate Priority: add multipliers, like xx banana(which fills current tiles or clears them, depends on which action player takes)
 
 function love.load()
   X_sprite = love.graphics.newImage("X2.png")

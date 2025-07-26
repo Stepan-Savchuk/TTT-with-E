@@ -96,13 +96,13 @@ function love.mousepressed(x, y, button, istouch)
         if button == 1 then
           if Grid[tx][ty] == "NIL" then
             Grid[tx][ty] = Turn
-            if check4win() then  
+            if check4win(tx, ty, mx, my) then  
               Win = true
               return
             end
             if Turn == "X" then
               ai()
-              if check4win() then
+              if check4win(0, 0, mx, my) then
                 Win = true
                 return
               end
@@ -135,17 +135,15 @@ function ai()
 end
 
 function check4win(cx, cy, maxx, maxy)
---  if ((Grid[0][0] == "X" and Grid[1][1] == "X" and Grid[2][2] == "X") or (Grid[0][0] == "X" and Grid[0][1] == "X" and Grid[0][2] == "X") or (Grid[1][0] == "X" and Grid[1][1] == "X" and Grid[1][2] == "X") or (Grid[2][0] == "X" and Grid[2][1] == "X" and Grid[2][2] == "X") or (Grid[0][0] == "X" and Grid[1][0] == "X" and Grid[2][0] == "X") or (Grid[0][1] == "X" and Grid[1][1] == "X" and Grid[2][1] == "X") or (Grid[0][2] == "X" and Grid[1][2] == "X" and Grid[2][2] == "X")) or ((Grid[0][0] == "O" and Grid[1][1] == "O" and Grid[2][2] == "O") or (Grid[0][0] == "O" and Grid[0][1] == "O" and Grid[0][2] == "O") or (Grid[1][0] == "O" and Grid[1][1] == "O" and Grid[1][2] == "O") or (Grid[2][0] == "O" and Grid[2][1] == "O" and Grid[2][2] == "O") or (Grid[0][0] == "O" and Grid[1][0] == "O" and Grid[2][0] == "O") or (Grid[0][1] == "O" and Grid[1][1] == "O" and Grid[2][1] == "O") or (Grid[0][2] == "O" and Grid[1][2] == "O" and Grid[2][2] == "O")) then
- --   
- --   return true
---  end
+  --if ((Grid[0][0] == "X" and Grid[1][1] == "X" and Grid[2][2] == "X") or (Grid[0][0] == "X" and Grid[0][1] == "X" and Grid[0][2] == "X") or (Grid[1][0] == "X" and Grid[1][1] == "X" and Grid[1][2] == "X") or (Grid[2][0] == "X" and Grid[2][1] == "X" and Grid[2][2] == "X") or (Grid[0][0] == "X" and Grid[1][0] == "X" and Grid[2][0] == "X") or (Grid[0][1] == "X" and Grid[1][1] == "X" and Grid[2][1] == "X") or (Grid[0][2] == "X" and Grid[1][2] == "X" and Grid[2][2] == "X")) or ((Grid[0][0] == "O" and Grid[1][1] == "O" and Grid[2][2] == "O") or (Grid[0][0] == "O" and Grid[0][1] == "O" and Grid[0][2] == "O") or (Grid[1][0] == "O" and Grid[1][1] == "O" and Grid[1][2] == "O") or (Grid[2][0] == "O" and Grid[2][1] == "O" and Grid[2][2] == "O") or (Grid[0][0] == "O" and Grid[1][0] == "O" and Grid[2][0] == "O") or (Grid[0][1] == "O" and Grid[1][1] == "O" and Grid[2][1] == "O") or (Grid[0][2] == "O" and Grid[1][2] == "O" and Grid[2][2] == "O")) then
+   -- return true
+  --end
   --
   --new algorithm for checking win is to through the row and column on which last clicked element was clicked on
-  --
-  --
-  for i = 0, maxx, 1 do
-    for j = 0, maxy, 1 do
-      
+  for i = 0, maxx-1, 1 do
+    if Grid[i][cy] == "X" then
+    else return false
     end
   end
+  return true
 end
